@@ -1,0 +1,6 @@
+cv_env/
+__pycache__/
+*.pyc
+.env
+*.pth
+*.pt
