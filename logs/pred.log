@@ -1,1 +1,3 @@
 INFO:root:{'class': 'dog', 'confidence': 0.8661849498748779}
+2026-02-21 13:50:20,365 - {'class': 'cat', 'confidence': 0.7735}
+2026-02-21 13:50:47,574 - {'class': 'cat', 'confidence': 0.8309}

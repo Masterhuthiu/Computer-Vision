@@ -1,7 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 import torch
 from torchvision import transforms, models
-from torchvision.models import ResNet18_Weights
 from PIL import Image
 import io
 import logging
@@ -13,7 +12,6 @@ import os
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Tạo thư mục logs nếu chưa tồn tại
 os.makedirs("logs", exist_ok=True)
 os.makedirs("model", exist_ok=True)
 
@@ -23,15 +21,13 @@ logging.basicConfig(
     format="%(asctime)s - %(message)s"
 )
 
-app = FastAPI(title="Cat vs Dog Classifier")
+app = FastAPI(title="Cat vs Dog Classifier API")
 
 # ==============================
 # Load model
 # ==============================
 
-weights = ResNet18_Weights.DEFAULT
-
-model = models.resnet18(weights=None)  # KHÔNG load pretrained khi predict
+model = models.resnet18(weights=None)  # Không load pretrained khi predict
 model.fc = torch.nn.Linear(model.fc.in_features, 2)
 
 model.load_state_dict(
@@ -42,27 +38,31 @@ model.to(DEVICE)
 model.eval()
 
 # ==============================
-# Transform (PHẢI giống train)
+# Transform (PHẢI giống train.py)
 # ==============================
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(
-        mean=weights.meta["mean"],
-        std=weights.meta["std"]
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
     )
 ])
 
 classes = ["cat", "dog"]
 
 # ==============================
-# API Endpoint
+# Routes
 # ==============================
 
 @app.get("/")
 def home():
     return {"message": "Cat vs Dog Model is running 🚀"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
@@ -79,7 +79,7 @@ async def predict(file: UploadFile = File(...)):
 
         result = {
             "class": classes[predicted.item()],
-            "confidence": float(confidence.item())
+            "confidence": round(float(confidence.item()), 4)
         }
 
         logging.info(result)
@@ -87,4 +87,4 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         logging.error(str(e))
-        return {"error": "Invalid image or prediction failed"}
+        return {"error": "Prediction failed"}
