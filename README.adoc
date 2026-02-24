@@ -1,1 +1,233 @@
+= Computer Vision: Cat vs Dog Classification
+:author: Masterhuthiu
+:toc:
+:toclevels: 3
+:sectnums:
+:source-highlighter: highlightjs
 
+== 📌 Overview
+
+This project implements an end-to-end Computer Vision pipeline for binary image classification (Cat vs Dog) using deep learning.
+
+The system includes:
+
+- Model training with PyTorch (ResNet18)
+- Validation and performance evaluation
+- FastAPI inference service
+- Docker containerization
+- CI/CD with GitHub Actions
+- Automated build and deployment pipeline
+
+Validation Accuracy achieved: *96.31%*
+
+---
+
+== 🧠 Problem Statement
+
+Build a robust image classification model capable of distinguishing between:
+
+- Cat
+- Dog
+
+Dataset size:
+- Total images: 8005
+- Train images: 6404
+- Validation images: 1601
+
+---
+
+== 🏗️ Architecture
+
+[source]
+----
+Client
+   ↓
+FastAPI REST API
+   ↓
+PyTorch Model (ResNet18)
+   ↓
+Prediction (Cat / Dog + Confidence)
+----
+
+---
+
+== 🧪 Model Details
+
+Model: ResNet18 (Pretrained on ImageNet)
+
+Transfer Learning approach:
+- Freeze early layers
+- Replace final FC layer
+- Fine-tune classifier
+
+Loss Function:
+- CrossEntropyLoss
+
+Optimizer:
+- Adam
+
+Epochs:
+- 5
+
+Device:
+- GPU (NVIDIA T4 on Colab) for training
+- CPU for inference
+
+---
+
+== 📊 Training Results
+
+[source]
+----
+Epoch 1 - Val Acc: 91.82%
+Epoch 2 - Val Acc: 94.13%
+Epoch 3 - Val Acc: 94.63%
+Epoch 4 - Val Acc: 95.57%
+Epoch 5 - Val Acc: 96.31%
+----
+
+Model saved as:
+
+----
+model/model_v1.pth
+----
+
+---
+
+== 🚀 Inference API
+
+Framework: FastAPI
+
+Endpoint:
+
+[source]
+----
+POST /predict
+----
+
+Example request:
+
+[source,bash]
+----
+curl -X POST http://127.0.0.1:8000/predict \
+     -F "file=@cat.jpg"
+----
+
+Example response:
+
+[source,json]
+----
+{
+  "class": "cat",
+  "confidence": 0.8309
+}
+----
+
+---
+
+== 🐳 Docker Deployment
+
+Dockerized application for portability.
+
+Build:
+
+[source,bash]
+----
+docker build -t catdog-api .
+----
+
+Run:
+
+[source,bash]
+----
+docker run -p 8000:8000 catdog-api
+----
+
+Image pushed to Docker Hub:
+
+----
+masterhuthiu/catdog-api:latest
+----
+
+---
+
+== 🔄 CI/CD Pipeline
+
+GitHub Actions workflow:
+
+----
+Push to main
+   ↓
+Build Docker Image
+   ↓
+Push to Docker Hub
+----
+
+Separate workflow available for:
+
+- Manual retraining
+- Scheduled retraining
+
+---
+
+== 🗂️ Project Structure
+
+[source]
+----
+Computer-Vision/
+│
+├── app.py
+├── train.py
+├── requirements.txt
+├── Dockerfile
+├── model/
+│   └── model_v1.pth
+└── .github/workflows/
+    ├── ci.yml
+    └── train.yml
+----
+
+---
+
+== 📈 Future Improvements
+
+- Model versioning (MLflow)
+- Dataset versioning (DVC)
+- ONNX export
+- Performance monitoring
+- A/B testing
+- Cloud deployment (AWS / GCP)
+- Kubernetes deployment
+
+---
+
+== 🏆 Skills Demonstrated
+
+- Deep Learning (PyTorch)
+- Transfer Learning
+- Computer Vision
+- REST API Development
+- Docker
+- CI/CD
+- MLOps Fundamentals
+
+---
+
+== 📌 Key Takeaways
+
+This project demonstrates the ability to:
+
+- Build and train a CNN model
+- Deploy a production-ready inference API
+- Implement CI/CD for ML systems
+- Containerize and distribute ML applications
+
+---
+
+== 📬 Contact
+
+GitHub:
+https://github.com/Masterhuthiu/Computer-Vision
+
+Docker Hub:
+https://hub.docker.com/r/masterhuthiu/catdog-api
